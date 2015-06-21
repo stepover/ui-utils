@@ -1,4 +1,5 @@
 angular.module('ui.keypress',[]).
+
 factory('keypressHelper', ['$parse', function keypress($parse){
   'use strict';
 
@@ -24,6 +25,7 @@ factory('keypressHelper', ['$parse', function keypress($parse){
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
+  //使用 factory 注册的这个服务返回的是个函数，这个函数被下面几个 directive 使用 ‘keypressHelper’ 调用
   return function(mode, scope, elm, attrs) {
     var params, combinations = [];
     params = scope.$eval(attrs['ui'+capitaliseFirstLetter(mode)]);
@@ -31,6 +33,13 @@ factory('keypressHelper', ['$parse', function keypress($parse){
     // Prepare combinations for simple checking
     angular.forEach(params, function (v, k) {
       var combination, expression;
+      /**
+       * Angular 通过 $parse 这个内部服务来进行表达式的运算，这个服务能够访问当前所属的作用域。
+       * 这个过程允许我们访问定义在$scope上的原始 JavaScript 数据和函数.
+       * 将 $parse 服务注入到控制器中，然后调用它就可以实现手动解析表达式。
+       * 《 AngularJS 权威指南》6.1
+       *  demo http://jsbin.com/UWuLALOf/1/edit?html,js,output
+       */
       expression = $parse(v);
 
       angular.forEach(k.split(' '), function(variation) {
